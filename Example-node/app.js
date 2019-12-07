@@ -8,6 +8,7 @@ var json = require('json'); // to work with JSON files(couchdb send data in JSON
 var logger = require('logger'); //
 var methodOverride = require('method-override');
 var nano = require('nano')('http://localhost:5984'); //get connected to couchdb
+var fs = require('fs');
 
 var db = nano.use('contact');
 var app = express(); // create app using express framework
@@ -22,6 +23,17 @@ app.use(methodOverride());
 app.use(express.static(path.join(__dirname,'public')));
 
 app.get('/',routes.index);
+
+app.get('/tasks', function(req, res) {
+        fs.readFile('./jsonExample.json', function(err, data) {
+            if(!err)
+            {
+                //res.send(data.toString());
+                res.send(JSON.parse(data.toString()).value);
+            } 
+        });
+});
+
 app.post('/createdb',function(req,res) {
     nano.db.create(req.body.dbname, function(err) {
         if(err) {
